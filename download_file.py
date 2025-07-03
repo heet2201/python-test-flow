@@ -1,25 +1,36 @@
 import requests
 import os
+import logging
+from typing import Optional
 from urllib.parse import urlparse
 from pathlib import Path
 
-def download_file(url, destination=None, chunk_size=8192):
+# Configure logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+def download_file(url: str, destination: Optional[str] = None, chunk_size: int = 8192) -> str:
     """
     Download a file from a URL using requests.
     
     Args:
-        url (str): The URL to download from
-        destination (str, optional): Local path to save the file. 
-                                   If None, uses filename from URL
-        chunk_size (int): Size of chunks to download at a time (default: 8192 bytes)
+        url: The URL to download from
+        destination: Local path to save the file. If None, uses filename from URL
+        chunk_size: Size of chunks to download at a time (default: 8192 bytes)
     
     Returns:
-        str: Path to the downloaded file
+        Path to the downloaded file
         
     Raises:
+        ValueError: If URL is invalid or empty
         requests.RequestException: If there's an error with the HTTP request
         IOError: If there's an error writing the file
     """
+    if not url or not isinstance(url, str):
+        raise ValueError("URL must be a non-empty string")
+    
+    if chunk_size <= 0:
+        raise ValueError("Chunk size must be positive")
     try:
         # Send GET request
         print(f"Downloading from: {url}")
@@ -67,7 +78,7 @@ def download_file(url, destination=None, chunk_size=8192):
         print(f"Error saving file: {e}")
         raise
 
-def main():
+def main() -> None:
     """
     Example usage of the download_file function
     """
